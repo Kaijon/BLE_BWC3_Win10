@@ -26,6 +26,7 @@ namespace SDKTemplate
             new Scenario() { Title="Client: Discover servers", ClassType=typeof(Scenario1_Discovery) },
             new Scenario() { Title="Client: Connect to a server", ClassType=typeof(Scenario2_Client) },
             //new Scenario() { Title="Server: Publish foreground", ClassType=typeof(Scenario3_ServerForeground) },
+            new Scenario() { Title="Client: WiFi Setting", ClassType=typeof(Scenario4_WiFi) },
         };
 
         public string SelectedBleDeviceId;
