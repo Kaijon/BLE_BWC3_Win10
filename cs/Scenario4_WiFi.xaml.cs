@@ -222,6 +222,62 @@ namespace SDKTemplate
             }
         }
         #endregion
+        private async void gatt_write_cmd(String cmd)
+        {
+            CharacteristicCollection.Clear();
+            RemoveValueChangedHandler();
+
+            IReadOnlyList<GattCharacteristic> characteristics = null;
+            try
+            {
+                // Ensure we have access to the device.
+                var accessStatus = await gatt_Getac.service.RequestAccessAsync();
+                if (accessStatus == DeviceAccessStatus.Allowed)
+                {
+                    // BT_Code: Get all the child characteristics of a service. Use the cache mode to specify uncached characterstics only 
+                    // and the new Async functions to get the characteristics of unpaired devices as well. 
+                    // var result = await gatt_Getac.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
+                    var result = await gatt_Getac.service.GetCharacteristicsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
+                    if (result.Status == GattCommunicationStatus.Success)
+                    {
+                        characteristics = result.Characteristics;
+                        //selectedCharacteristic = attributeInfoDisp.characteristic;
+                    }
+                    else
+                    {
+                        rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                        // On error, act as if there are no characteristics.
+                        characteristics = new List<GattCharacteristic>();
+                    }
+                }
+                else
+                {
+                    // Not granted access
+                    rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                    // On error, act as if there are no characteristics.
+                    characteristics = new List<GattCharacteristic>();
+
+                }
+                //CharacteristicList.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                rootPage.NotifyUser("Restricted service. Can't read characteristics: " + ex.Message,
+                    NotifyType.ErrorMessage);
+                // On error, act as if there are no characteristics.
+                characteristics = new List<GattCharacteristic>();
+            }
+
+            foreach (GattCharacteristic c in characteristics)
+            {
+                CharacteristicCollection.Add(new BluetoothLEAttributeDisplay(c));
+                char_Getac = new BluetoothLEAttributeDisplay(c);
+            }
+            CharacteristicList_Get();
+            CharacteristicWrite_Click(cmd.ToString());
+        }
 
         #region Enumerating Services
         private async Task<bool> ClearBluetoothLEDeviceAsync()
@@ -930,5 +986,11 @@ namespace SDKTemplate
             }
         }
 
+        private void BtnAPSet_Click(object sender, RoutedEventArgs e)
+        {
+            //Todo
+            gatt_write_cmd("cmd300:1234567890");
+        }
     }
 }
+

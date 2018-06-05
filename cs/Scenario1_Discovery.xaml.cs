@@ -165,10 +165,11 @@ namespace SDKTemplate
                         // Make sure device isn't already present in the list.
                         if (FindBluetoothLEDeviceDisplay(deviceInfo.Id) == null)
                         {
-                            if (deviceInfo.Name != string.Empty)
+                            if (deviceInfo.Name != string.Empty)                           
                             {
-                                // If device has a friendly name display it immediately.
-                                KnownDevices.Add(new BluetoothLEDeviceDisplay(deviceInfo));
+                                if (System.Text.RegularExpressions.Regex.IsMatch(deviceInfo.Name, tbFilter.Text))
+                                    // If device has a friendly name display it immediately.
+                                    KnownDevices.Add(new BluetoothLEDeviceDisplay(deviceInfo));
                             }
                             else
                             {
