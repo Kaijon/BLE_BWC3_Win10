@@ -42,8 +42,8 @@
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Description:" Style="{StaticResource SampleHeaderTextStyle}"/>
             <TextBlock Style="{StaticResource ScenarioDescriptionTextStyle}" Text="WiFi settings "/>
-            <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Text="This scenario connects to the Bluetooth Low Energy device selected in the &quot;WiFi&quot; scenario and communicates with the device."/>
-            <TextBlock Style="{StaticResource ListItemTextStyle}" TextWrapping="Wrap" Margin="0,10,0,0">
+            <TextBlock TextWrapping="Wrap" Margin="0,10,0,0" Text="This scenario connects to the Bluetooth Low Energy device selected in the &quot;WiFi&quot; scenario and communicates with the device." />
+            <TextBlock Style="{StaticResource ListItemTextStyle}" TextWrapping="Wrap" Margin="0,10,0,0" HorizontalAlignment="Stretch">
                 Selected device: <Run Text="{x:Bind rootPage.SelectedBleDeviceName}" FontWeight="Bold"/>
             </TextBlock>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
@@ -53,16 +53,20 @@
                 <Button x:Name="CharacteristicReadButton" Content="Read Value" Click="{x:Bind CharacteristicReadButton_Click}"
                         Visibility="Collapsed" Margin="0,10,10,0"/>
             </StackPanel>
-                    <ComboBox x:Name="ServiceList" Margin="0,10,0,0" PlaceholderText="Choose a service" Visibility="Collapsed"
+            <ComboBox x:Name="ServiceList" Margin="0,10,0,0" PlaceholderText="Choose a service" Visibility="Collapsed"
                       ItemsSource="{x:Bind ServiceCollection}" DisplayMemberPath="Name"
                       SelectionChanged="{x:Bind ServiceList_SelectionChanged}"/>
-                <ComboBox x:Name="CharacteristicList" Margin="0,10,0,0" PlaceholderText="Choose a characteristic" Visibility="Collapsed"
+            <ComboBox x:Name="CharacteristicList" Margin="0,10,0,0" PlaceholderText="Choose a characteristic" Visibility="Collapsed"
                       ItemsSource="{x:Bind CharacteristicCollection}"  DisplayMemberPath="Name"
                       SelectionChanged="{x:Bind CharacteristicList_SelectionChanged}" />
-             <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" RequestedTheme="Default">
+                <TextBlock x:Name="textBlock1" Text="WiFi Settings ..." FontWeight="Bold" FontStyle="Italic" />
                 <Button x:Name="ValueChangedSubscribeToggle" Content="Subscribe to value changes" Click="{x:Bind ValueChangedSubscribeToggle_Click}"
-                        Visibility="Collapsed" Margin="0,10,10,0"/>
-                <TextBox x:Name="tbShow" Text="TextBox" VerticalAlignment="Center" BorderThickness="0"/>
+                        Visibility="Collapsed" Margin="0,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="tbWiFiMode" Text="WiFi Mode" TextWrapping="Wrap" Margin="0,0,20,0" FontWeight="Normal"/>
+                <TextBlock x:Name="tbPWD" Text="Password" TextWrapping="Wrap"/>
             </StackPanel>
             <StackPanel x:Name="CharacteristicWritePanel" Margin="0,10,0,0" Visibility="Collapsed">
                 <TextBox x:Name="CharacteristicWriteValue" PlaceholderText="Enter text/number to send"/>
@@ -86,9 +90,11 @@
                     Visibility="Collapsed" Margin="0,10,10,0"/>
                 <Button x:Name="ValueChangedSubscribeToggle1" Content="Subscribe to value changes" Click="{x:Bind Path=ValueChangedSubscribeToggle_Click}"
                     Visibility="Collapsed" Margin="0,10,10,0"/>
+                <ComboBox x:Name="cbWiFiMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
                 <TextBox x:Name="tbAP_PWD" Text="1234567890"/>
                 <Button x:Name="BtnAPSet" Content="Set" Margin="10,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAPSet_Click"/>
             </StackPanel>
-        </StackPanel>     
+            <Canvas Height="100" Width="100"/>
+        </StackPanel>
     </ScrollViewer>
 </Page>

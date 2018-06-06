@@ -78,12 +78,16 @@ namespace SDKTemplate
             timer_con.Interval = TimeSpan.FromMilliseconds(1000);
             timer_con.Tick += Timer_con_Tick;
             //timer_con.Start();
+            cbWiFiMode.Items.Add("AP");
+            cbWiFiMode.Items.Add("STA");
+
         }
 
-        private async void BtnTimerStart_Click()
+        private void BtnTimerStart_Click()
         {
             timer_con.Start();
         }
+
         private async void Timer_con_Tick(object sender, object e)
         {
             ConnectButton.IsEnabled = true;
@@ -113,7 +117,7 @@ namespace SDKTemplate
             if (bluetoothLeDevice != null)
             {
                 count += 1;
-                tbShow.Text = count.ToString();
+                //tbShow.Text = count.ToString();
 
                 // Note: BluetoothLEDevice.GattServices property will return an empty list for unpaired devices. For all uses we recommend using the GetGattServicesAsync method.
                 // BT_Code: GetGattServicesAsync returns a list of all the supported services of the device (even if it's not paired to the system).
@@ -279,7 +283,193 @@ namespace SDKTemplate
             CharacteristicWrite_Click(cmd.ToString());
         }
 
-        #region Enumerating Services
+        private async void CharacteristicList_Get()
+        {
+            selectedCharacteristic = null;
+
+            //var attributeInfoDisp = (BluetoothLEAttributeDisplay)CharacteristicList.SelectedItem;
+            if (char_Getac == null)
+            {
+                EnableCharacteristicPanels(GattCharacteristicProperties.None);
+                return;
+            }
+
+            selectedCharacteristic = char_Getac.characteristic;
+            if (selectedCharacteristic == null)
+            {
+                rootPage.NotifyUser("No characteristic selected", NotifyType.ErrorMessage);
+                return;
+            }
+
+            // Get all the child descriptors of a characteristics. Use the cache mode to specify uncached descriptors only 
+            // and the new Async functions to get the descriptors of unpaired devices as well. 
+            var result = await selectedCharacteristic.GetDescriptorsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
+            if (result.Status != GattCommunicationStatus.Success)
+            {
+                rootPage.NotifyUser("Descriptor read failure: " + result.Status.ToString(), NotifyType.ErrorMessage);
+            }
+
+            // BT_Code: There's no need to access presentation format unless there's at least one. 
+            presentationFormat = null;
+            if (selectedCharacteristic.PresentationFormats.Count > 0)
+            {
+
+                if (selectedCharacteristic.PresentationFormats.Count.Equals(1))
+                {
+                    // Get the presentation format since there's only one way of presenting it
+                    presentationFormat = selectedCharacteristic.PresentationFormats[0];
+                }
+                else
+                {
+                    // It's difficult to figure out how to split up a characteristic and encode its different parts properly.
+                    // In this case, we'll just encode the whole thing to a string to make it easy to print out.
+                }
+            }
+
+            // Enable/disable operations based on the GattCharacteristicProperties.
+            // EnableCharacteristicPanels(selectedCharacteristic.CharacteristicProperties);
+        }
+
+        private void DisconnectButton_Click()
+        {
+            DisconnectButton.IsEnabled = true;
+
+            try
+            {
+                if (bluetoothLeDevice != null)
+                {
+                    bluetoothLeDevice.Dispose();
+                    bluetoothLeDevice = null;
+                    rootPage.NotifyUser("Failed to connect to device.", NotifyType.ErrorMessage);
+                }
+            }
+            catch (Exception ex) when (ex.HResult == E_DEVICE_NOT_AVAILABLE)
+            {
+                rootPage.NotifyUser("Bluetooth radio is not on.", NotifyType.ErrorMessage);
+            }
+
+        }
+
+        private void BtnAPSet_Click(object sender, RoutedEventArgs e)
+        {
+            //Todo
+            gatt_write_cmd("cmd300:1234567890");
+        }
+
+        private async void BtnStartRecord_Click()
+        {
+            CharacteristicCollection.Clear();
+            RemoveValueChangedHandler();
+
+            IReadOnlyList<GattCharacteristic> characteristics = null;
+            try
+            {
+                // Ensure we have access to the device.
+                var accessStatus = await gatt_Getac.service.RequestAccessAsync();
+                if (accessStatus == DeviceAccessStatus.Allowed)
+                {
+                    // BT_Code: Get all the child characteristics of a service. Use the cache mode to specify uncached characterstics only 
+                    // and the new Async functions to get the characteristics of unpaired devices as well. 
+                    // var result = await gatt_Getac.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
+                    var result = await gatt_Getac.service.GetCharacteristicsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
+                    if (result.Status == GattCommunicationStatus.Success)
+                    {
+                        characteristics = result.Characteristics;
+                        //selectedCharacteristic = attributeInfoDisp.characteristic;
+                    }
+                    else
+                    {
+                        rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                        // On error, act as if there are no characteristics.
+                        characteristics = new List<GattCharacteristic>();
+                    }
+                }
+                else
+                {
+                    // Not granted access
+                    rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                    // On error, act as if there are no characteristics.
+                    characteristics = new List<GattCharacteristic>();
+
+                }
+                //CharacteristicList.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                rootPage.NotifyUser("Restricted service. Can't read characteristics: " + ex.Message,
+                    NotifyType.ErrorMessage);
+                // On error, act as if there are no characteristics.
+                characteristics = new List<GattCharacteristic>();
+            }
+
+            foreach (GattCharacteristic c in characteristics)
+            {
+                CharacteristicCollection.Add(new BluetoothLEAttributeDisplay(c));
+                char_Getac = new BluetoothLEAttributeDisplay(c);
+            }
+            CharacteristicList_Get();
+            CharacteristicWrite_Click("cmd201");
+        }
+
+        private async void BtnStopRecord_Click()
+        {
+            CharacteristicCollection.Clear();
+            RemoveValueChangedHandler();
+
+            IReadOnlyList<GattCharacteristic> characteristics = null;
+            try
+            {
+                // Ensure we have access to the device.
+                var accessStatus = await gatt_Getac.service.RequestAccessAsync();
+                if (accessStatus == DeviceAccessStatus.Allowed)
+                {
+                    // BT_Code: Get all the child characteristics of a service. Use the cache mode to specify uncached characterstics only 
+                    // and the new Async functions to get the characteristics of unpaired devices as well. 
+                    // var result = await gatt_Getac.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
+                    var result = await gatt_Getac.service.GetCharacteristicsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
+                    if (result.Status == GattCommunicationStatus.Success)
+                    {
+                        characteristics = result.Characteristics;
+                        //selectedCharacteristic = attributeInfoDisp.characteristic;
+                    }
+                    else
+                    {
+                        rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                        // On error, act as if there are no characteristics.
+                        characteristics = new List<GattCharacteristic>();
+                    }
+                }
+                else
+                {
+                    // Not granted access
+                    rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
+
+                    // On error, act as if there are no characteristics.
+                    characteristics = new List<GattCharacteristic>();
+
+                }
+                //CharacteristicList.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex)
+            {
+                rootPage.NotifyUser("Restricted service. Can't read characteristics: " + ex.Message,
+                    NotifyType.ErrorMessage);
+                // On error, act as if there are no characteristics.
+                characteristics = new List<GattCharacteristic>();
+            }
+
+            foreach (GattCharacteristic c in characteristics)
+            {
+                CharacteristicCollection.Add(new BluetoothLEAttributeDisplay(c));
+                char_Getac = new BluetoothLEAttributeDisplay(c);
+            }
+            CharacteristicList_Get();
+            CharacteristicWrite_Click("cmd202");
+        }
+        
         private async Task<bool> ClearBluetoothLEDeviceAsync()
         {
             if (subscribedForNotifications)
@@ -355,27 +545,7 @@ namespace SDKTemplate
             }
             ConnectButton.IsEnabled = true;
         }
-        #endregion
-        private async void DisconnectButton_Click()
-        {
-            DisconnectButton.IsEnabled = true;
-
-            try
-            {
-                if (bluetoothLeDevice != null)
-                {
-                    bluetoothLeDevice.Dispose();
-                    bluetoothLeDevice = null;
-                    rootPage.NotifyUser("Failed to connect to device.", NotifyType.ErrorMessage);
-                }
-            }
-            catch (Exception ex) when (ex.HResult == E_DEVICE_NOT_AVAILABLE)
-            {
-                rootPage.NotifyUser("Bluetooth radio is not on.", NotifyType.ErrorMessage);
-            }
-
-        }
-
+        
         #region Enumerating Characteristics
         private async void ServiceList_SelectionChanged()
         {
@@ -501,53 +671,7 @@ namespace SDKTemplate
             // Enable/disable operations based on the GattCharacteristicProperties.
             EnableCharacteristicPanels(selectedCharacteristic.CharacteristicProperties);
         }
-
-        private async void CharacteristicList_Get()
-        {
-            selectedCharacteristic = null;
-
-            //var attributeInfoDisp = (BluetoothLEAttributeDisplay)CharacteristicList.SelectedItem;
-            if (char_Getac == null)
-            {
-                EnableCharacteristicPanels(GattCharacteristicProperties.None);
-                return;
-            }
-
-            selectedCharacteristic = char_Getac.characteristic;
-            if (selectedCharacteristic == null)
-            {
-                rootPage.NotifyUser("No characteristic selected", NotifyType.ErrorMessage);
-                return;
-            }
-
-            // Get all the child descriptors of a characteristics. Use the cache mode to specify uncached descriptors only 
-            // and the new Async functions to get the descriptors of unpaired devices as well. 
-            var result = await selectedCharacteristic.GetDescriptorsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
-            if (result.Status != GattCommunicationStatus.Success)
-            {
-                rootPage.NotifyUser("Descriptor read failure: " + result.Status.ToString(), NotifyType.ErrorMessage);
-            }
-
-            // BT_Code: There's no need to access presentation format unless there's at least one. 
-            presentationFormat = null;
-            if (selectedCharacteristic.PresentationFormats.Count > 0)
-            {
-
-                if (selectedCharacteristic.PresentationFormats.Count.Equals(1))
-                {
-                    // Get the presentation format since there's only one way of presenting it
-                    presentationFormat = selectedCharacteristic.PresentationFormats[0];
-                }
-                else
-                {
-                    // It's difficult to figure out how to split up a characteristic and encode its different parts properly.
-                    // In this case, we'll just encode the whole thing to a string to make it easy to print out.
-                }
-            }
-
-            // Enable/disable operations based on the GattCharacteristicProperties.
-            // EnableCharacteristicPanels(selectedCharacteristic.CharacteristicProperties);
-        }
+                
         private void SetVisibility(UIElement element, bool visible)
         {
             element.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
@@ -583,119 +707,6 @@ namespace SDKTemplate
             }
         }
 
-        private async void BtnStartRecord_Click()
-        {
-            CharacteristicCollection.Clear();
-            RemoveValueChangedHandler();
-
-            IReadOnlyList<GattCharacteristic> characteristics = null;
-            try
-            {
-                // Ensure we have access to the device.
-                var accessStatus = await gatt_Getac.service.RequestAccessAsync();
-                if (accessStatus == DeviceAccessStatus.Allowed)
-                {
-                    // BT_Code: Get all the child characteristics of a service. Use the cache mode to specify uncached characterstics only 
-                    // and the new Async functions to get the characteristics of unpaired devices as well. 
-                    // var result = await gatt_Getac.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
-                    var result = await gatt_Getac.service.GetCharacteristicsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
-                    if (result.Status == GattCommunicationStatus.Success)
-                    {
-                        characteristics = result.Characteristics;
-                        //selectedCharacteristic = attributeInfoDisp.characteristic;
-                    }
-                    else
-                    {
-                        rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
-
-                        // On error, act as if there are no characteristics.
-                        characteristics = new List<GattCharacteristic>();
-                    }
-                }
-                else
-                {
-                    // Not granted access
-                    rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
-
-                    // On error, act as if there are no characteristics.
-                    characteristics = new List<GattCharacteristic>();
-
-                }
-                //CharacteristicList.Visibility = Visibility.Visible;
-            }
-            catch (Exception ex)
-            {
-                rootPage.NotifyUser("Restricted service. Can't read characteristics: " + ex.Message,
-                    NotifyType.ErrorMessage);
-                // On error, act as if there are no characteristics.
-                characteristics = new List<GattCharacteristic>();
-            }
-
-            foreach (GattCharacteristic c in characteristics)
-            {
-                CharacteristicCollection.Add(new BluetoothLEAttributeDisplay(c));
-                char_Getac = new BluetoothLEAttributeDisplay(c);
-            }
-            CharacteristicList_Get();
-            CharacteristicWrite_Click("cmd201");
-        }
-
-        private async void BtnStopRecord_Click()
-        {
-            CharacteristicCollection.Clear();
-            RemoveValueChangedHandler();
-
-            IReadOnlyList<GattCharacteristic> characteristics = null;
-            try
-            {
-                // Ensure we have access to the device.
-                var accessStatus = await gatt_Getac.service.RequestAccessAsync();
-                if (accessStatus == DeviceAccessStatus.Allowed)
-                {
-                    // BT_Code: Get all the child characteristics of a service. Use the cache mode to specify uncached characterstics only 
-                    // and the new Async functions to get the characteristics of unpaired devices as well. 
-                    // var result = await gatt_Getac.service.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
-                    var result = await gatt_Getac.service.GetCharacteristicsForUuidAsync(char_w, BluetoothCacheMode.Uncached);
-                    if (result.Status == GattCommunicationStatus.Success)
-                    {
-                        characteristics = result.Characteristics;
-                        //selectedCharacteristic = attributeInfoDisp.characteristic;
-                    }
-                    else
-                    {
-                        rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
-
-                        // On error, act as if there are no characteristics.
-                        characteristics = new List<GattCharacteristic>();
-                    }
-                }
-                else
-                {
-                    // Not granted access
-                    rootPage.NotifyUser("Error accessing service.", NotifyType.ErrorMessage);
-
-                    // On error, act as if there are no characteristics.
-                    characteristics = new List<GattCharacteristic>();
-
-                }
-                //CharacteristicList.Visibility = Visibility.Visible;
-            }
-            catch (Exception ex)
-            {
-                rootPage.NotifyUser("Restricted service. Can't read characteristics: " + ex.Message,
-                    NotifyType.ErrorMessage);
-                // On error, act as if there are no characteristics.
-                characteristics = new List<GattCharacteristic>();
-            }
-
-            foreach (GattCharacteristic c in characteristics)
-            {
-                CharacteristicCollection.Add(new BluetoothLEAttributeDisplay(c));
-                char_Getac = new BluetoothLEAttributeDisplay(c);
-            }
-            CharacteristicList_Get();
-            CharacteristicWrite_Click("cmd202");
-        }
         private async void CharacteristicWrite_Click(string cmd)
         {
             var writeBuffer = CryptographicBuffer.ConvertStringToBinary(cmd,
@@ -984,12 +995,6 @@ namespace SDKTemplate
             {
                 return data[1];
             }
-        }
-
-        private void BtnAPSet_Click(object sender, RoutedEventArgs e)
-        {
-            //Todo
-            gatt_write_cmd("cmd300:1234567890");
         }
     }
 }
