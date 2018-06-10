@@ -80,7 +80,16 @@ namespace SDKTemplate
             //timer_con.Start();
             cbWiFiMode.Items.Add("AP");
             cbWiFiMode.Items.Add("STA");
-
+            cbWiFiBand.Items.Add("5GHz");
+            cbWiFiBand.Items.Add("2.4GHz");
+            cbWiFiCryto.Items.Add("NONE");
+            cbWiFiCryto.Items.Add("WEP");
+            cbWiFiCryto.Items.Add("WPA");
+            cbWiFiCryto.Items.Add("WPA2");
+            cbWiFiChan.Items.Add("1");
+            cbWiFiChan.Items.Add("6");
+            cbWiFiChan.Items.Add("157");
+            cbWiFiChan.Items.Add("165");
         }
 
         private void BtnTimerStart_Click()
@@ -349,11 +358,79 @@ namespace SDKTemplate
             }
 
         }
+        private async void Disconnect2Button_Click()
+        {
+            DisconnectButton.IsEnabled = true;
+
+            try
+            {
+                var success = await ClearBluetoothLEDeviceAsync();
+                if (!success)
+                {
+                    rootPage.NotifyUser("Error: Unable to reset app state", NotifyType.ErrorMessage);
+                }
+
+                rootPage.NotifyUser("Disconnect app", NotifyType.ErrorMessage);
+
+                //if (bluetoothLeDevice != null)
+                //{
+                //bluetoothLeDevice.Dispose();
+                //bluetoothLeDevice = null;
+                //rootPage.NotifyUser("Failed to connect to device.", NotifyType.ErrorMessage);
+                //}
+            }
+            catch (Exception ex) when (ex.HResult == E_DEVICE_NOT_AVAILABLE)
+            {
+                rootPage.NotifyUser("Bluetooth radio is not on.", NotifyType.ErrorMessage);
+            }
+
+        }
+
 
         private void BtnAPSet_Click(object sender, RoutedEventArgs e)
         {
-            //Todo
-            gatt_write_cmd("cmd300:1234567890");
+            string AP = "AP";
+            string band, crypto;
+            int rev = cbWiFiMode.SelectedItem.ToString().CompareTo(AP);
+            if (rev == 0 )
+            {                
+                string pwd = tbAP_PWD.Text;
+
+                switch (cbWiFiCryto.SelectedItem.ToString())
+                {
+                    case "NONE":
+                        crypto = "A";
+                        break;
+                    case "WEP":
+                        crypto = "B";
+                        break;
+                    case "WPA":
+                        crypto = "C";
+                        break;
+                    case "WPA2":
+                        crypto = "D";
+                        break;
+                    default:
+                        crypto = "B";
+                        break;
+                }
+
+                switch (cbWiFiCryto.SelectedItem.ToString())
+                {
+                    case "5GHz":
+                        band = "a";
+                        break;
+                    case "2.4GHz":
+                        band = "b";
+                        break;
+                    default:
+                        band = "a";
+                        break;
+                }
+
+                string cmd = $"cmd104:{pwd}:{crypto}:{band}";
+                gatt_write_cmd(cmd);
+            }
         }
 
         private async void BtnStartRecord_Click()

@@ -48,7 +48,8 @@
             </TextBlock>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                 <Button x:Name="ConnectButton" Content="Connect" Click="{x:Bind ConnectButton_Click}" Margin="0,0,10,0" />
-                <Button x:Name="DisconnectButton" Content="Disconnect" Click="{x:Bind DisconnectButton_Click}" Margin="0,0,10,0"/>
+                <Button x:Name="DisconnectButton" Content="Disconnect1" Click="{x:Bind DisconnectButton_Click}" Margin="0,0,10,0"/>
+                <Button x:Name="DisconnectButton2" Content="Disconnect2" Click="{x:Bind Disconnect2Button_Click}" Margin="0,0,10,0"/>
                 <Button x:Name="BtnTimer" Content="Timer Start" Click="{x:Bind BtnTimerStart_Click}" />
                 <Button x:Name="CharacteristicReadButton" Content="Read Value" Click="{x:Bind CharacteristicReadButton_Click}"
                         Visibility="Collapsed" Margin="0,10,10,0"/>
@@ -59,14 +60,17 @@
             <ComboBox x:Name="CharacteristicList" Margin="0,10,0,0" PlaceholderText="Choose a characteristic" Visibility="Collapsed"
                       ItemsSource="{x:Bind CharacteristicCollection}"  DisplayMemberPath="Name"
                       SelectionChanged="{x:Bind CharacteristicList_SelectionChanged}" />
-            <StackPanel Orientation="Horizontal" RequestedTheme="Default">
+            <StackPanel Orientation="Horizontal" RequestedTheme="Default" Height="30">
                 <TextBlock x:Name="textBlock1" Text="WiFi Settings ..." FontWeight="Bold" FontStyle="Italic" />
                 <Button x:Name="ValueChangedSubscribeToggle" Content="Subscribe to value changes" Click="{x:Bind ValueChangedSubscribeToggle_Click}"
                         Visibility="Collapsed" Margin="0,0,0,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="tbWiFiMode" Text="WiFi Mode" TextWrapping="Wrap" Margin="0,0,20,0" FontWeight="Normal"/>
-                <TextBlock x:Name="tbPWD" Text="Password" TextWrapping="Wrap"/>
+                <TextBlock x:Name="tbBAND" Text="Band" TextWrapping="Wrap" Margin="0,0,40,0"/>
+                <TextBlock x:Name="tbPWD" Text="Password" TextWrapping="Wrap" Margin="0,0,40,0"/>
+                <TextBlock x:Name="tbCRYTO" Text="Crypto" TextWrapping="Wrap" Margin="0,0,25,0"/>
+                <TextBlock x:Name="tbChannel" Text="Channel" TextWrapping="Wrap"/>
             </StackPanel>
             <StackPanel x:Name="CharacteristicWritePanel" Margin="0,10,0,0" Visibility="Collapsed">
                 <TextBox x:Name="CharacteristicWriteValue" PlaceholderText="Enter text/number to send"/>
@@ -90,9 +94,12 @@
                     Visibility="Collapsed" Margin="0,10,10,0"/>
                 <Button x:Name="ValueChangedSubscribeToggle1" Content="Subscribe to value changes" Click="{x:Bind Path=ValueChangedSubscribeToggle_Click}"
                     Visibility="Collapsed" Margin="0,10,10,0"/>
-                <ComboBox x:Name="cbWiFiMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
+                <ComboBox x:Name="cbWiFiMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0" />
+                <ComboBox x:Name="cbWiFiBand" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0" />
                 <TextBox x:Name="tbAP_PWD" Text="1234567890"/>
-                <Button x:Name="BtnAPSet" Content="Set" Margin="10,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAPSet_Click"/>
+                <ComboBox x:Name="cbWiFiCryto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0"/>
+                <ComboBox x:Name="cbWiFiChan" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
+                <Button x:Name="BtnAPSet" Content="Set" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAPSet_Click"/>
             </StackPanel>
             <Canvas Height="100" Width="100"/>
         </StackPanel>
