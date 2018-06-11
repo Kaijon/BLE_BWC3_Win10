@@ -88,8 +88,13 @@ namespace SDKTemplate
             cbWiFiCryto.Items.Add("WPA2");
             cbWiFiChan.Items.Add("1");
             cbWiFiChan.Items.Add("6");
-            cbWiFiChan.Items.Add("157");
+            cbWiFiChan.Items.Add("11");
+            cbWiFiChan.Items.Add("153");
+			cbWiFiChan.Items.Add("157");
             cbWiFiChan.Items.Add("165");
+            cbWiFiMode.SelectedItem = "AP";
+            cbWiFiBand.SelectedItem = "5GHz";
+            cbWiFiCryto.SelectedItem = "WPA2";
         }
 
         private void BtnTimerStart_Click()
@@ -390,7 +395,7 @@ namespace SDKTemplate
         private void BtnAPSet_Click(object sender, RoutedEventArgs e)
         {
             string AP = "AP";
-            string band, crypto;
+            string band, crypto, cmd;
             int rev = cbWiFiMode.SelectedItem.ToString().CompareTo(AP);
             if (rev == 0 )
             {                
@@ -415,10 +420,14 @@ namespace SDKTemplate
                         break;
                 }
 
-                switch (cbWiFiCryto.SelectedItem.ToString())
+                // For Debug
+                // System.Diagnostics.Debug.WriteLine("band:" + cbWiFiBand.SelectedItem.ToString());
+
+                switch (cbWiFiBand.SelectedItem.ToString())
                 {
                     case "5GHz":
                         band = "a";
+                        
                         break;
                     case "2.4GHz":
                         band = "b";
@@ -428,7 +437,16 @@ namespace SDKTemplate
                         break;
                 }
 
-                string cmd = $"cmd104:{pwd}:{crypto}:{band}";
+                int chan_cur_pos = cbWiFiChan.SelectedIndex;
+                if (chan_cur_pos == -1)
+                {
+                    cmd = $"cmd104:{pwd}:{crypto}:{band}";
+                }
+                else
+                {
+                    string chan = cbWiFiChan.SelectedItem.ToString();
+                    cmd = $"cmd104:{pwd}:{crypto}:{band}:{chan}";
+                }
                 gatt_write_cmd(cmd);
             }
         }
