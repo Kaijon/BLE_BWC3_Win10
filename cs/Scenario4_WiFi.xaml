@@ -48,11 +48,17 @@
             </TextBlock>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
                 <Button x:Name="ConnectButton" Content="Connect" Click="{x:Bind ConnectButton_Click}" Margin="0,0,10,0" />
-                <Button x:Name="DisconnectButton" Content="Disconnect1" Click="{x:Bind DisconnectButton_Click}" Margin="0,0,10,0"/>
+                <Button x:Name="DisconnectButton" Content="Disconnect1" Click="{x:Bind Disconnect2Button_Click}" Margin="0,0,10,0"/>
                 <Button x:Name="DisconnectButton2" Content="Disconnect2" Click="{x:Bind Disconnect2Button_Click}" Margin="0,0,10,0"/>
-                <Button x:Name="BtnTimer" Content="Timer Start" Click="{x:Bind BtnTimerStart_Click}" />
-                <Button x:Name="CharacteristicReadButton" Content="Read Value" Click="{x:Bind CharacteristicReadButton_Click}"
-                        Visibility="Collapsed" Margin="0,10,10,0"/>
+                <Button x:Name="BtnTimer" Content="Timer Start" Click="{x:Bind BtnTimerStart_Click}" Margin="0,0,10,0"/>
+                <Button x:Name="CharacteristicReadButton" Content="Read Value" Click="{x:Bind CharacteristicReadButton_Click}" Visibility="Collapsed" Margin="0,0,10,0"/>
+                <TextBlock x:Name="tbClearNo" Text="ClearNo" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="tbConNo" Text="ConNo" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="tbGattNo" Text="GattNo" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="tbT1" Text="GattNo" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock x:Name="tbT2" Text="GattNo" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,10,0"/>
             </StackPanel>
             <ComboBox x:Name="ServiceList" Margin="0,10,0,0" PlaceholderText="Choose a service" Visibility="Collapsed"
                       ItemsSource="{x:Bind ServiceCollection}" DisplayMemberPath="Name"
@@ -101,7 +107,18 @@
                 <ComboBox x:Name="cbWiFiChan" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
                 <Button x:Name="BtnAPSet" Content="Set" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAPSet_Click"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <TextBlock x:Name="tbSTA_ID" Text="SSID" TextWrapping="Wrap" Margin="0,0,40,0"/>
+                <TextBlock x:Name="tbSTA_PWD" Text="PWD" TextWrapping="Wrap" Margin="0,0,40,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                <ComboBox x:Name="cbSSID" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
+                <ComboBox x:Name="cbPSWD" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
+                <TextBox x:Name="tbPSWD" Text="Enter PSWD" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,10,0"/>
+                <Button x:Name="BtnSTASet" Content="Set" Margin="0,0,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="BtnAPSet_Click"/>
+            </StackPanel>
             <Canvas Height="100" Width="100"/>
+            <ListBox/>
         </StackPanel>
     </ScrollViewer>
 </Page>

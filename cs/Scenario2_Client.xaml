@@ -59,13 +59,13 @@
                       ItemsSource="{x:Bind CharacteristicCollection}"  DisplayMemberPath="Name"
                       SelectionChanged="{x:Bind CharacteristicList_SelectionChanged}" />
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="BtnStartRecord" Content="StartRecord" Click="{x:Bind BtnStartRecord_Click}" Margin="0,10,10,0" Width="102" Height="32"/>
-                <Button x:Name="BtnStopRecord" Content="StopRecord" Click="{x:Bind BtnStopRecord_Click}" Margin="0,10,10,0" Width="102" Height="32"/>
+                <Button x:Name="BtnStartRecord" Content="StartRecord" Click="{x:Bind BtnStartRecord_Click}" Margin="0,0,10,0" Width="102" Height="32"/>
+                <Button x:Name="BtnStopRecord" Content="StopRecord" Click="{x:Bind BtnStopRecord_Click}" Margin="0,0,10,0" Width="102" Height="32"/>
                 <Button x:Name="CharacteristicReadButton" Content="Read Value" Click="{x:Bind CharacteristicReadButton_Click}"
-                        Visibility="Collapsed" Margin="0,10,10,0"/>
+                        Visibility="Collapsed" Margin="0,0,10,0"/>
                 <Button x:Name="ValueChangedSubscribeToggle" Content="Subscribe to value changes" Click="{x:Bind ValueChangedSubscribeToggle_Click}"
-                        Visibility="Collapsed" Margin="0,10,10,0"/>
-                <Button x:Name="BtnTimer" Content="Timer Start" Click="{x:Bind BtnTimerStart_Click}" Margin="0,10,10,0" Width="102" Height="32"/>
+                        Visibility="Collapsed" Margin="0,0,10,0"/>
+                <Button x:Name="BtnTimer" Content="Timer Start" Click="{x:Bind BtnTimerStart_Click}" Margin="0,0,10,0"/>
                 <TextBox x:Name="tbShow" Text="TextBox"/>
             </StackPanel>
             <StackPanel x:Name="CharacteristicWritePanel" Margin="0,10,0,0" Visibility="Collapsed">
